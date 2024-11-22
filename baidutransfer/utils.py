@@ -3,12 +3,16 @@
 import json
 import logging
 import os
+import time
 
 import aiohttp
 
 USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36"
 
 logger = logging.getLogger("baidutransfer")
+
+# 默认API调用间隔时间（秒）
+DEFAULT_API_INTERVAL = 5.0
 
 
 class BaiduYunPanResourceNotFoundError(RuntimeError):
@@ -110,3 +114,12 @@ async def http_request(
             if response.headers.get("Content-Type", "").startswith("application/json"):
                 body = json.loads(body)
             return response.status, response.headers, body
+
+
+def api_sleep(interval=DEFAULT_API_INTERVAL):
+    """
+    API调用间隔控制
+    Args:
+        interval: 间隔时间，单位秒
+    """
+    time.sleep(interval)

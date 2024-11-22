@@ -6,6 +6,7 @@ import logging
 import urllib.parse
 
 from . import utils
+from .utils import api_sleep
 
 
 class BaiduYunPanAPI(object):
@@ -13,10 +14,11 @@ class BaiduYunPanAPI(object):
 
     root_url = "https://pan.baidu.com"
 
-    def __init__(self, cookie):
+    def __init__(self, cookie, interval=None):
         self._cookie = self._process_cookie(cookie)
         self._bdstoken = None
         self._randsk = None
+        self.api_interval = interval or utils.DEFAULT_API_INTERVAL
 
     def _process_cookie(self, cookie):
         pos = cookie.find("BDCLND=")
@@ -47,6 +49,7 @@ class BaiduYunPanAPI(object):
             raise utils.BaiduYunPanResourceNotFoundError()
         if check_errno and body["errno"]:
             raise utils.BaiduYunPanAPIError(body["errno"], body.get("show_msg"))
+        api_sleep(self.api_interval)
         return body
 
     @property
